@@ -5,8 +5,7 @@
 1. Create a Supabase project.
 2. Open the project dashboard and click **Connect**.
 3. Copy the **Session pooler** connection string for `DATABASE_URL`.
-4. Copy the **Direct connection** string for `DIRECT_URL` if reachable from Render. If it is not reachable, use the Session pooler string for both variables.
-5. Add `?pgbouncer=true&connection_limit=1` to pooled Supabase URLs. If the URL already has query parameters, append `&pgbouncer=true&connection_limit=1`.
+4. Add `?pgbouncer=true&connection_limit=1` to the pooled Supabase URL. If the URL already has query parameters, append `&pgbouncer=true&connection_limit=1`.
 
 ## Render
 
@@ -14,7 +13,6 @@
 2. Render will read `render.yaml` from the repository root.
 3. When prompted, enter:
    - `DATABASE_URL`: Supabase Session pooler connection string
-   - `DIRECT_URL`: Supabase Direct connection string, or the same Session pooler string if direct IPv6 is unavailable
 4. Confirm the service URLs:
    - API: `https://lifeos-api-poppeii.onrender.com`
    - Web: `https://lifeos-web-poppeii.onrender.com`
