@@ -14,27 +14,26 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: lifeos/package-lock.json
+          cache-dependency-path: package-lock.json
       - name: Install dependencies
-        working-directory: lifeos
         run: npm install
       - name: Generate Prisma client
-        working-directory: lifeos/backend
+        working-directory: backend
         run: npx prisma generate
       - name: Lint backend
-        working-directory: lifeos/backend
+        working-directory: backend
         run: npm run lint
       - name: Lint frontend
-        working-directory: lifeos/frontend
+        working-directory: frontend
         run: npm run lint
       - name: Backend tests
-        working-directory: lifeos/backend
+        working-directory: backend
         run: npm run test:unit
       - name: Build backend
-        working-directory: lifeos/backend
+        working-directory: backend
         run: npm run build
       - name: Build frontend
-        working-directory: lifeos/frontend
+        working-directory: frontend
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001
         run: npm run build
