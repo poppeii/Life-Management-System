@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: lifeos/package-lock.json
+      - name: Install dependencies
+        working-directory: lifeos
+        run: npm install
+      - name: Generate Prisma client
+        working-directory: lifeos/backend
+        run: npx prisma generate
+      - name: Lint backend
+        working-directory: lifeos/backend
+        run: npm run lint
+      - name: Lint frontend
+        working-directory: lifeos/frontend
+        run: npm run lint
+      - name: Backend tests
+        working-directory: lifeos/backend
+        run: npm run test:unit
+      - name: Build backend
+        working-directory: lifeos/backend
+        run: npm run build
+      - name: Build frontend
+        working-directory: lifeos/frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:3001
+        run: npm run build

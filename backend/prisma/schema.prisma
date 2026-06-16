@@ -1,0 +1,322 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum GoalStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  ON_TRACK
+  AT_RISK
+  COMPLETED
+  PAUSED
+  CANCELLED
+}
+
+enum GoalCategory {
+  HEALTH
+  CAREER
+  FINANCE
+  LEARNING
+  PERSONAL
+  RELATIONSHIP
+  TRAVEL
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum MilestoneStatus {
+  TODO
+  COMPLETED
+}
+
+enum HabitFrequency {
+  DAILY
+  WEEKLY
+  WEEKDAYS
+  WEEKENDS
+  CUSTOM
+}
+
+enum HabitCategory {
+  HEALTH
+  LEARNING
+  PRODUCTIVITY
+  MINDFULNESS
+  PERSONAL
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  WAITING
+  DONE
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum LearningStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  PAUSED
+}
+
+enum LearningCategory {
+  FRONTEND
+  BACKEND
+  DATABASE
+  DEVOPS
+  QA
+  SYSTEM_ANALYSIS
+  ENGLISH
+  OTHER
+}
+
+enum Mood {
+  HAPPY
+  CALM
+  TIRED
+  STRESSED
+  MOTIVATED
+  SAD
+  NEUTRAL
+}
+
+model User {
+  id             String          @id @default(cuid())
+  name           String
+  email          String          @unique
+  passwordHash   String
+  avatarUrl      String?
+  role           Role            @default(USER)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  deletedAt      DateTime?
+  refreshTokens  RefreshToken[]
+  goals          Goal[]
+  habits         Habit[]
+  habitCheckIns  HabitCheckIn[]
+  tasks          Task[]
+  taskComments   TaskComment[]
+  taskTags       TaskTag[]
+  learningItems  LearningItem[]
+  studyLogs      StudyLog[]
+  journalEntries JournalEntry[]
+  activityLogs   ActivityLog[]
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Goal {
+  id          String          @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  category    GoalCategory
+  priority    Priority        @default(MEDIUM)
+  status      GoalStatus      @default(NOT_STARTED)
+  progress    Int             @default(0)
+  startDate   DateTime?
+  targetDate  DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  deletedAt   DateTime?
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  milestones  GoalMilestone[]
+  tasks       Task[]
+}
+
+model GoalMilestone {
+  id          String          @id @default(cuid())
+  goalId      String
+  title       String
+  description String?
+  status      MilestoneStatus @default(TODO)
+  dueDate     DateTime?
+  completedAt DateTime?
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  deletedAt   DateTime?
+  goal        Goal            @relation(fields: [goalId], references: [id], onDelete: Cascade)
+}
+
+model Habit {
+  id           String          @id @default(cuid())
+  userId       String
+  title        String
+  description  String?
+  category     HabitCategory
+  frequency    HabitFrequency  @default(DAILY)
+  targetValue  Int             @default(1)
+  unit         String           @default("times")
+  icon         String?
+  color        String           @default("#7c3aed")
+  reminderTime String?
+  isArchived   Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  deletedAt    DateTime?
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  checkIns     HabitCheckIn[]
+}
+
+model HabitCheckIn {
+  id          String   @id @default(cuid())
+  habitId     String
+  userId      String
+  checkInDate DateTime
+  value       Int      @default(1)
+  isCompleted Boolean  @default(false)
+  note        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, userId, checkInDate])
+}
+
+model Task {
+  id          String        @id @default(cuid())
+  userId      String
+  goalId      String?
+  title       String
+  description String?
+  status      TaskStatus    @default(TODO)
+  priority    TaskPriority  @default(MEDIUM)
+  dueDate     DateTime?
+  startDate   DateTime?
+  order       Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal        Goal?         @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  subtasks    TaskSubtask[]
+  comments    TaskComment[]
+}
+
+model TaskSubtask {
+  id          String   @id @default(cuid())
+  taskId      String
+  title       String
+  isCompleted Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TaskTag {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  color     String   @default("#7c3aed")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LearningItem {
+  id             String           @id @default(cuid())
+  userId         String
+  title          String
+  description    String?
+  category       LearningCategory
+  source         String?
+  status         LearningStatus   @default(NOT_STARTED)
+  progress       Int              @default(0)
+  totalHours     Float            @default(0)
+  completedHours Float            @default(0)
+  startDate      DateTime?
+  targetDate     DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studyLogs      StudyLog[]
+}
+
+model StudyLog {
+  id             String       @id @default(cuid())
+  learningItemId String
+  userId         String
+  topic          String
+  durationMinutes Int
+  note           String?
+  studiedAt      DateTime     @default(now())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  learningItem   LearningItem @relation(fields: [learningItemId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model JournalEntry {
+  id             String   @id @default(cuid())
+  userId         String
+  entryDate      DateTime
+  mood           Mood     @default(NEUTRAL)
+  whatWentWell   String?
+  whatCanImprove String?
+  tomorrowFocus  String?
+  gratitude      String?
+  note           String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  deletedAt      DateTime?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, entryDate])
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  userId      String
+  action      String
+  entityType  String
+  entityId    String?
+  description String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
