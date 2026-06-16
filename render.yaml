@@ -1,0 +1,41 @@
+services:
+  - type: web
+    runtime: docker
+    name: lifeos-api-poppeii
+    plan: free
+    region: singapore
+    branch: main
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRES_IN
+        value: 15m
+      - key: REFRESH_TOKEN_EXPIRES_IN
+        value: 7d
+      - key: FRONTEND_URL
+        value: https://lifeos-web-poppeii.onrender.com
+
+  - type: web
+    runtime: docker
+    name: lifeos-web-poppeii
+    plan: free
+    region: singapore
+    branch: main
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: https://lifeos-api-poppeii.onrender.com

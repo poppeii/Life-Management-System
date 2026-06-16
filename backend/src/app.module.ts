@@ -12,6 +12,7 @@ import { LearningModule } from './modules/learning/learning.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { HealthController } from './health.controller';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
 
@@ -30,6 +31,7 @@ import { RolesGuard } from './shared/guards/roles.guard';
     JournalModule,
     ActivityLogsModule
   ],
+  controllers: [HealthController],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard }

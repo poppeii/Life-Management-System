@@ -22,6 +22,7 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://lifeos:lifeos@postgres:5432/lifeos?schema=public
+      DIRECT_URL: postgresql://lifeos:lifeos@postgres:5432/lifeos?schema=public
       JWT_ACCESS_SECRET: docker-access-secret
       JWT_REFRESH_SECRET: docker-refresh-secret
       ACCESS_TOKEN_EXPIRES_IN: 15m
