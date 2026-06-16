@@ -113,6 +113,7 @@ model User {
   updatedAt      DateTime        @updatedAt
   deletedAt      DateTime?
   refreshTokens  RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
   goals          Goal[]
   habits         Habit[]
   habitCheckIns  HabitCheckIn[]
@@ -133,6 +134,18 @@ model RefreshToken {
   revokedAt DateTime?
   createdAt DateTime  @default(now())
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Goal {

@@ -75,11 +75,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="hidden text-sm text-slate-500 lg:block">{t('topbarMessage')}</div>
           <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
-            <LanguageSelector compact />
             <div className="hidden min-w-0 items-center gap-2 sm:flex">
               <CircleUserRound className="shrink-0 text-primary-600" />
               <span className="max-w-36 truncate text-sm font-medium">{user?.name}</span>
             </div>
+            <LanguageSelector compact />
             <Button variant="ghost" className="h-9 w-9 px-0 sm:w-[132px] sm:px-3" onClick={logout}><LogOut size={16} /><span className="hidden min-w-0 truncate sm:inline">{t('logout')}</span></Button>
           </div>
         </header>

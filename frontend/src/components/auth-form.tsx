@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { authApi } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth-store';
 import { useTranslation } from '@/lib/i18n';
+import { passwordIssues } from './password-policy';
 import { Button, Card, Input } from './ui';
 
 const loginSchema = z.object({
@@ -19,7 +20,12 @@ const loginSchema = z.object({
 });
 
 const registerSchema = loginSchema.extend({
-  name: z.string().min(1)
+  name: z.string().min(1),
+  password: z.string().superRefine((value, context) => {
+    for (const message of passwordIssues(value)) {
+      context.addIssue({ code: z.ZodIssueCode.custom, message });
+    }
+  })
 });
 
 type LoginValues = z.infer<typeof loginSchema>;
@@ -35,6 +41,9 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
     resolver: zodResolver(mode === 'register' ? registerSchema : loginSchema),
     defaultValues: { name: '', email: '', password: '' }
   });
+  const registerPasswordIssues = mode === 'register' && (form.formState.submitCount > 0 || form.formState.touchedFields.password)
+    ? passwordIssues(form.watch('password'))
+    : [];
 
   async function submit(values: Values) {
     try {
@@ -94,13 +103,24 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
                 {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
               </button>
             </div>
-            {form.formState.errors.password ? <span className="mt-2 block text-xs font-medium text-rose-600">{form.formState.errors.password.message}</span> : null}
+            {mode === 'register' && registerPasswordIssues.length ? (
+              <ul className="mt-2 space-y-1 text-xs font-medium text-rose-600">
+                {registerPasswordIssues.map((message) => <li key={message}>{message}</li>)}
+              </ul>
+            ) : form.formState.errors.password ? <span className="mt-2 block text-xs font-medium text-rose-600">{form.formState.errors.password.message}</span> : null}
           </div>
           <Button className="h-12 w-full text-base" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : null}
             {mode === 'register' ? t('register') : t('login')}
           </Button>
         </form>
+        {mode === 'login' ? (
+          <p className="mt-4 text-center text-sm">
+            <Link className="font-semibold text-primary-700 transition hover:text-primary-600" href="/forgot-password">
+              ลืมรหัสผ่าน?
+            </Link>
+          </p>
+        ) : null}
         <p className="mt-6 text-center text-sm font-medium text-slate-500">
           {mode === 'register' ? t('alreadyHaveAccount') : t('newHere')}{' '}
           <Link className="font-semibold text-primary-700 transition hover:text-primary-600" href={mode === 'register' ? '/login' : '/register'}>
