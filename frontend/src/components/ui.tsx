@@ -16,16 +16,16 @@ export function Button({ className, variant = 'primary', ...props }: React.Butto
   );
 }
 
-export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
-  return <input className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none ring-primary-100 focus:ring-4" {...props} />;
+export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
+  return <input className={clsx('h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none ring-primary-100 focus:ring-4', className)} {...props} />;
 }
 
-export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea className="min-h-24 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none ring-primary-100 focus:ring-4" {...props} />;
+export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return <textarea className={clsx('min-h-24 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none ring-primary-100 focus:ring-4', className)} {...props} />;
 }
 
-export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none ring-primary-100 focus:ring-4" {...props} />;
+export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
+  return <select className={clsx('h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none ring-primary-100 focus:ring-4', className)} {...props} />;
 }
 
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
