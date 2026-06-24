@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, LockKeyhole } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -9,8 +9,9 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { authApi } from '@/lib/api';
+import { AuthPanelIntro, AuthShell } from './auth-shell';
 import { passwordIssues } from './password-policy';
-import { Button, Card, Input } from './ui';
+import { Button, Input } from './ui';
 
 const schema = z.object({
   password: z.string().superRefine((value, context) => {
@@ -47,31 +48,28 @@ export function ResetPasswordForm({ token }: { token?: string }) {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-slate-50 px-4 py-10">
-      <Card className="w-full max-w-[520px] border-slate-200/80 p-6 shadow-soft sm:p-8">
-        <div className="mb-7">
-          <div className="mb-5 grid size-14 place-items-center rounded-2xl bg-primary-600 text-2xl font-bold text-white shadow-lg shadow-primary-600/20">L</div>
-          <h1 className="text-3xl font-semibold tracking-normal text-ink">ตั้งรหัสผ่านใหม่</h1>
-          <p className="mt-2 text-base leading-7 text-slate-500">เลือกรหัสผ่านใหม่ที่ปลอดภัยสำหรับบัญชี LifeOS ของคุณ</p>
-        </div>
+    <AuthShell>
+        <AuthPanelIntro title="ตั้งรหัสผ่านใหม่" subtitle="เลือกรหัสผ่านใหม่ที่ปลอดภัยสำหรับบัญชี LifeOS ของคุณ" />
         {!token ? (
-          <div className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm font-medium text-rose-700">ลิงก์ตั้งรหัสผ่านไม่ถูกต้องหรือหมดอายุ</div>
+          <div className="rounded-[20px] border border-rose-100 bg-rose-50/90 p-4 text-sm font-medium text-rose-700">ลิงก์ตั้งรหัสผ่านไม่ถูกต้องหรือหมดอายุ</div>
         ) : (
           <form onSubmit={form.handleSubmit(submit)} className="space-y-5">
             <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-800" htmlFor="password">รหัสผ่านใหม่</label>
+              <label className="mb-2 block text-sm font-medium text-slate-700" htmlFor="password">รหัสผ่านใหม่</label>
               <div className="relative">
+                <LockKeyhole aria-hidden="true" className="absolute left-5 top-1/2 size-5 -translate-y-1/2 text-slate-400" />
                 <Input
                   id="password"
                   autoComplete="new-password"
-                  className="h-12 pr-12 text-base"
+                  className="h-14 rounded-[20px] border-white/70 bg-white/70 pl-14 pr-14 text-base shadow-sm placeholder:text-slate-400 focus:bg-white"
+                  placeholder="••••••••"
                   type={showPassword ? 'text' : 'password'}
                   {...form.register('password')}
                 />
                 <button
                   type="button"
                   aria-label={showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
-                  className="absolute right-2 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-100"
+                  className="absolute right-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-slate-400 transition hover:bg-white hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-sky-100"
                   onClick={() => setShowPassword((current) => !current)}
                 >
                   {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
@@ -84,11 +82,21 @@ export function ResetPasswordForm({ token }: { token?: string }) {
               ) : null}
             </div>
             <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-800" htmlFor="confirmPassword">ยืนยันรหัสผ่านใหม่</label>
-              <Input id="confirmPassword" autoComplete="new-password" className="h-12 text-base" type={showPassword ? 'text' : 'password'} {...form.register('confirmPassword')} />
+              <label className="mb-2 block text-sm font-medium text-slate-700" htmlFor="confirmPassword">ยืนยันรหัสผ่านใหม่</label>
+              <div className="relative">
+                <LockKeyhole aria-hidden="true" className="absolute left-5 top-1/2 size-5 -translate-y-1/2 text-slate-400" />
+                <Input
+                  id="confirmPassword"
+                  autoComplete="new-password"
+                  className="h-14 rounded-[20px] border-white/70 bg-white/70 pl-14 text-base shadow-sm placeholder:text-slate-400 focus:bg-white"
+                  placeholder="••••••••"
+                  type={showPassword ? 'text' : 'password'}
+                  {...form.register('confirmPassword')}
+                />
+              </div>
               {form.formState.errors.confirmPassword ? <span className="mt-2 block text-xs font-medium text-rose-600">{form.formState.errors.confirmPassword.message}</span> : null}
             </div>
-            <Button className="h-12 w-full text-base" disabled={form.formState.isSubmitting}>
+            <Button className="h-14 w-full rounded-[20px] bg-gradient-to-r from-[#2980b9] to-[#6dd5fa] text-base shadow-[0_16px_34px_rgba(41,128,185,0.24)] hover:from-[#2474a7] hover:to-[#5acbf3]" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : null}
               ตั้งรหัสผ่านใหม่
             </Button>
@@ -96,9 +104,8 @@ export function ResetPasswordForm({ token }: { token?: string }) {
         )}
         <p className="mt-6 text-center text-sm font-medium text-slate-500">
           กลับไปหน้า{' '}
-          <Link className="font-semibold text-primary-700 transition hover:text-primary-600" href="/login">เข้าสู่ระบบ</Link>
+          <Link className="font-semibold text-slate-800 transition hover:text-[#2980b9]" href="/login">เข้าสู่ระบบ</Link>
         </p>
-      </Card>
-    </main>
+    </AuthShell>
   );
 }
